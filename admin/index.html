@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f3ec">
+  <title>Flower Workshop — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --paper:#f7f3ec;--paper2:#efe9df;--card:#fffdfa;--ink:#24332d;--muted:#738078;
+      --forest:#315e4c;--forest2:#244638;--rose:#c9838d;--line:rgba(49,94,76,.14);
+      --gold:#c99643;--danger:#9a4545;--shadow:0 16px 44px rgba(43,58,50,.08);
+    }
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%}
+    body{margin:0;min-height:100svh;background:
+      radial-gradient(circle at 4% 2%,rgba(201,131,141,.10),transparent 27%),
+      radial-gradient(circle at 96% 100%,rgba(49,94,76,.09),transparent 30%),var(--paper);
+      color:var(--ink);font-family:"Noto Sans Thai",system-ui,-apple-system,sans-serif}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    .app{width:min(1180px,100%);margin:auto;padding:max(22px,env(safe-area-inset-top)) 16px max(32px,env(safe-area-inset-bottom))}
+    .hidden{display:none!important}
+    .login-shell{min-height:calc(100svh - 54px);display:grid;place-items:center}
+    .login-card{width:min(440px,100%);background:rgba(255,253,250,.94);border:1px solid rgba(255,255,255,.9);
+      border-radius:28px;padding:30px 24px;box-shadow:var(--shadow)}
+    .eyebrow{font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--forest);margin:0 0 16px}
+    h1{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:clamp(36px,8vw,54px);line-height:1;margin:0 0 12px;color:var(--forest2)}
+    h2{font-size:22px;margin:0;color:var(--forest2)}
+    .lead{color:var(--muted);line-height:1.7;font-size:14px;margin:0 0 22px}
+    .code-row{display:flex;gap:9px}
+    .code-input,.search{width:100%;border:1px solid var(--line);outline:0;background:#fff;border-radius:15px;color:var(--ink)}
+    .code-input{height:54px;padding:0 15px;font-size:16px;letter-spacing:.05em;text-transform:uppercase}
+    .code-input:focus,.search:focus{border-color:rgba(49,94,76,.55);box-shadow:0 0 0 4px rgba(49,94,76,.07)}
+    .primary{border:0;border-radius:15px;background:var(--forest);color:#fff;font-weight:700;padding:0 18px;min-height:54px;white-space:nowrap}
+    .primary:disabled{opacity:.55;cursor:not-allowed}
+    .error{display:none;margin:12px 0 0;color:var(--danger);font-size:13px}.error.show{display:block}
+    .topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px}
+    .brand .eyebrow{margin-bottom:6px}.brand-title{font-family:"DM Serif Display",Georgia,serif;font-size:36px;line-height:1;color:var(--forest2)}
+    .actions{display:flex;gap:8px}
+    .icon-btn{height:42px;border:1px solid var(--line);background:rgba(255,253,250,.9);border-radius:13px;padding:0 14px;color:var(--forest);font-weight:700}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+    .stat{background:rgba(255,253,250,.9);border:1px solid rgba(255,255,255,.85);border-radius:19px;padding:15px 16px;box-shadow:0 8px 24px rgba(43,58,50,.045)}
+    .stat-label{font-size:11px;color:var(--muted);margin-bottom:5px}.stat-value{font-size:23px;font-weight:700;color:var(--forest2);line-height:1.15}
+    .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px}.search{height:46px;padding:0 15px;font-size:14px}
+    .count{font-size:12px;color:var(--muted);white-space:nowrap}
+    .list{display:grid;gap:10px}
+    .item{display:grid;grid-template-columns:104px minmax(0,1fr);gap:15px;background:rgba(255,253,250,.95);border:1px solid rgba(255,255,255,.9);
+      border-radius:20px;padding:11px;box-shadow:0 8px 28px rgba(43,58,50,.05)}
+    .thumb{width:104px;height:104px;border:0;padding:0;border-radius:15px;overflow:hidden;background:var(--paper2)}
+    .thumb img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .2s ease}.thumb:hover img{transform:scale(1.025)}
+    .item-body{min-width:0;display:flex;flex-direction:column;justify-content:center}
+    .item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .name{font-weight:700;font-size:16px;overflow-wrap:anywhere}.time{font-size:11px;color:var(--muted);white-space:nowrap}
+    .rating{margin-top:8px;display:flex;align-items:center;gap:7px}.stars{letter-spacing:.08em;color:var(--gold);font-size:14px}.rating-text{font-size:11px;color:var(--muted)}
+    .comment{font-size:13px;line-height:1.55;color:#55645c;margin:8px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .pending{display:inline-flex;align-items:center;width:max-content;margin-top:8px;padding:4px 8px;border-radius:999px;background:var(--paper2);font-size:10px;color:var(--muted);font-weight:600}
+    .empty{text-align:center;padding:58px 20px;color:var(--muted);background:rgba(255,253,250,.78);border-radius:20px;border:1px dashed var(--line)}
+    .loader{width:18px;height:18px;border:2px solid rgba(49,94,76,.18);border-top-color:var(--forest);border-radius:50%;animation:spin .7s linear infinite;margin:auto}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    dialog{border:0;padding:0;background:transparent;width:min(720px,calc(100% - 24px));max-width:none}
+    dialog::backdrop{background:rgba(21,31,26,.72);backdrop-filter:blur(5px)}
+    .modal{background:var(--card);border-radius:23px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+    .modal-img-wrap{position:relative;background:#1d2521}.modal-img{display:block;width:100%;max-height:70svh;object-fit:contain;margin:auto}
+    .close{position:absolute;top:12px;right:12px;width:42px;height:42px;border:0;border-radius:50%;background:rgba(20,27,24,.74);color:white;font-size:22px;line-height:1}
+    .modal-info{padding:18px 20px 21px}.modal-meta{font-size:12px;color:var(--muted);margin-top:6px}.modal-comment{font-size:14px;line-height:1.7;margin:12px 0 0;color:#55645c;white-space:pre-wrap}
+    .toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%) translateY(12px);opacity:0;pointer-events:none;
+      background:var(--forest2);color:#fff;border-radius:999px;padding:9px 14px;font-size:12px;transition:.2s ease;z-index:10}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media(max-width:620px){
+      .topbar{align-items:center}.brand-title{font-size:30px}.actions .icon-btn span{display:none}
+      .stats{gap:7px}.stat{padding:12px}.stat-value{font-size:20px}
+      .item{grid-template-columns:86px minmax(0,1fr);gap:12px}.thumb{width:86px;height:86px}
+      .time{display:none}.comment{font-size:12px}.toolbar{align-items:stretch;flex-direction:column}.count{padding-left:2px}
+    }
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="login" class="login-shell">
+      <div class="login-card">
+        <p class="eyebrow">FLOWER WORKSHOP · ADMIN</p>
+        <h1>Workshop gallery.</h1>
+        <p class="lead">กรอกรหัส Admin เพื่อดูรายชื่อผลงาน รูปดอกไม้ คะแนนความพึงพอใจ และความคิดเห็นของผู้เข้าร่วม</p>
+        <form id="login-form">
+          <div class="code-row">
+            <input id="code" class="code-input" type="password" autocomplete="current-password" placeholder="Admin code" required>
+            <button id="login-btn" class="primary" type="submit">เข้า Admin</button>
+          </div>
+          <p id="login-error" class="error">รหัสไม่ถูกต้อง กรุณาลองใหม่</p>
+        </form>
+      </div>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <header class="topbar">
+        <div class="brand">
+          <p class="eyebrow">FLOWER WORKSHOP · ADMIN</p>
+          <div class="brand-title">Bloom list</div>
+        </div>
+        <div class="actions">
+          <button id="refresh" class="icon-btn" type="button">↻ <span>รีเฟรช</span></button>
+          <button id="logout" class="icon-btn" type="button">ออก</button>
+        </div>
+      </header>
+
+      <section class="stats">
+        <div class="stat"><div class="stat-label">ผลงานทั้งหมด</div><div id="total" class="stat-value">—</div></div>
+        <div class="stat"><div class="stat-label">ตอบแบบประเมิน</div><div id="feedback-count" class="stat-value">—</div></div>
+        <div class="stat"><div class="stat-label">คะแนนเฉลี่ย</div><div id="average" class="stat-value">—</div></div>
+      </section>
+
+      <div class="toolbar">
+        <input id="search" class="search" type="search" placeholder="ค้นหาชื่อดอกไม้...">
+        <div id="visible-count" class="count"></div>
+      </div>
+
+      <div id="loading" class="empty"><div class="loader"></div></div>
+      <div id="empty" class="empty hidden">ยังไม่มีผลงานส่งเข้ามา</div>
+      <div id="list" class="list"></div>
+    </section>
+  </main>
+
+  <dialog id="viewer">
+    <div class="modal">
+      <div class="modal-img-wrap">
+        <img id="viewer-img" class="modal-img" alt="">
+        <button id="viewer-close" class="close" type="button" aria-label="ปิด">×</button>
+      </div>
+      <div class="modal-info">
+        <h2 id="viewer-name"></h2>
+        <div id="viewer-meta" class="modal-meta"></div>
+        <div id="viewer-comment" class="modal-comment"></div>
+      </div>
+    </div>
+  </dialog>
+  <div id="toast" class="toast">อัปเดตแล้ว</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
+  <script>
+  (function(){
+    var SUPABASE_URL='https://cjqcyjuxsqtuybjqumlk.supabase.co';
+    var SUPABASE_KEY='sb_publishable_RcExGR9O_43T_v2vfh313w_JGb_w1GS';
+    var BUCKET='flower-workshop-uploads';
+    var SESSION='flowerWorkshopAdminCode';
+    var client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+      auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+    });
+
+    var login=document.getElementById('login');
+    var dashboard=document.getElementById('dashboard');
+    var loginForm=document.getElementById('login-form');
+    var codeInput=document.getElementById('code');
+    var loginBtn=document.getElementById('login-btn');
+    var loginError=document.getElementById('login-error');
+    var list=document.getElementById('list');
+    var loading=document.getElementById('loading');
+    var empty=document.getElementById('empty');
+    var search=document.getElementById('search');
+    var visibleCount=document.getElementById('visible-count');
+    var viewer=document.getElementById('viewer');
+    var rows=[];
+    var adminCode='';
+
+    function imageUrl(path){
+      return client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+    }
+    function dateText(value){
+      try{
+        return new Intl.DateTimeFormat('th-TH',{dateStyle:'short',timeStyle:'short',timeZone:'Asia/Bangkok'}).format(new Date(value));
+      }catch(e){return value||''}
+    }
+    function stars(n){
+      n=Number(n||0); return n ? '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n) : '';
+    }
+    function setBusy(on){
+      loginBtn.disabled=on;
+      loginBtn.textContent=on?'กำลังตรวจ...':'เข้า Admin';
+    }
+    function showLoginError(show){
+      loginError.classList.toggle('show',!!show);
+    }
+    function showDashboard(){
+      login.classList.add('hidden');
+      dashboard.classList.remove('hidden');
+    }
+    function showLogin(){
+      dashboard.classList.add('hidden');
+      login.classList.remove('hidden');
+      codeInput.focus();
+    }
+    function toast(){
+      var el=document.getElementById('toast');
+      el.classList.add('show');
+      setTimeout(function(){el.classList.remove('show')},1200);
+    }
+    function updateStats(){
+      var rated=rows.filter(function(r){return r.rating!=null});
+      var avg=rated.length?rated.reduce(function(s,r){return s+Number(r.rating)},0)/rated.length:0;
+      document.getElementById('total').textContent=rows.length;
+      document.getElementById('feedback-count').textContent=rated.length;
+      document.getElementById('average').textContent=rated.length?avg.toFixed(1):'—';
+    }
+    function render(){
+      var q=search.value.trim().toLowerCase();
+      var filtered=rows.filter(function(r){
+        return !q || String(r.flower_name||'').toLowerCase().indexOf(q)>-1;
+      });
+      list.innerHTML='';
+      visibleCount.textContent=filtered.length+' รายการ';
+      empty.classList.toggle('hidden',filtered.length!==0 || rows.length!==0);
+      filtered.forEach(function(r){
+        var item=document.createElement('article');
+        item.className='item';
+
+        var thumb=document.createElement('button');
+        thumb.className='thumb';
+        thumb.type='button';
+        thumb.setAttribute('aria-label','ดูรูป '+r.flower_name);
+        var img=document.createElement('img');
+        img.src=imageUrl(r.image_path);
+        img.alt='ดอกไม้ '+r.flower_name;
+        img.loading='lazy';
+        thumb.appendChild(img);
+        thumb.addEventListener('click',function(){openViewer(r)});
+
+        var body=document.createElement('div');
+        body.className='item-body';
+        var top=document.createElement('div');
+        top.className='item-top';
+        var name=document.createElement('div');
+        name.className='name';
+        name.textContent=r.flower_name;
+        var time=document.createElement('div');
+        time.className='time';
+        time.textContent=dateText(r.created_at);
+        top.appendChild(name); top.appendChild(time);
+        body.appendChild(top);
+
+        if(r.rating!=null){
+          var rating=document.createElement('div');
+          rating.className='rating';
+          var starEl=document.createElement('span');
+          starEl.className='stars';
+          starEl.textContent=stars(r.rating);
+          var rt=document.createElement('span');
+          rt.className='rating-text';
+          rt.textContent=r.rating+' / 5';
+          rating.appendChild(starEl); rating.appendChild(rt);
+          body.appendChild(rating);
+          if(r.comment){
+            var c=document.createElement('p');
+            c.className='comment';
+            c.textContent=r.comment;
+            body.appendChild(c);
+          }
+        }else{
+          var p=document.createElement('span');
+          p.className='pending';
+          p.textContent='ยังไม่ส่งแบบประเมิน';
+          body.appendChild(p);
+        }
+        item.appendChild(thumb); item.appendChild(body);
+        list.appendChild(item);
+      });
+    }
+    function openViewer(r){
+      document.getElementById('viewer-img').src=imageUrl(r.image_path);
+      document.getElementById('viewer-img').alt='ดอกไม้ '+r.flower_name;
+      document.getElementById('viewer-name').textContent=r.flower_name;
+      document.getElementById('viewer-meta').textContent=dateText(r.created_at)+(r.rating!=null?' · '+r.rating+' / 5 ดาว':' · ยังไม่ส่งแบบประเมิน');
+      document.getElementById('viewer-comment').textContent=r.comment||'';
+      if(typeof viewer.showModal==='function') viewer.showModal();
+      else viewer.setAttribute('open','');
+    }
+    async function loadData(showToast){
+      loading.classList.remove('hidden');
+      list.classList.add('hidden');
+      empty.classList.add('hidden');
+      var result=await client.rpc('flower_workshop_admin_list',{p_code:adminCode});
+      loading.classList.add('hidden');
+      list.classList.remove('hidden');
+      if(result.error){
+        console.error(result.error);
+        sessionStorage.removeItem(SESSION);
+        adminCode='';
+        showLogin();
+        showLoginError(true);
+        return false;
+      }
+      rows=result.data||[];
+      updateStats();
+      render();
+      if(showToast) toast();
+      return true;
+    }
+
+    loginForm.addEventListener('submit',async function(e){
+      e.preventDefault();
+      showLoginError(false);
+      adminCode=codeInput.value.trim().toUpperCase();
+      if(!adminCode)return;
+      setBusy(true);
+      var ok=await loadData(false);
+      setBusy(false);
+      if(ok){
+        try{sessionStorage.setItem(SESSION,adminCode)}catch(_){}
+        codeInput.value='';
+        showDashboard();
+      }
+    });
+    document.getElementById('refresh').addEventListener('click',function(){loadData(true)});
+    document.getElementById('logout').addEventListener('click',function(){
+      try{sessionStorage.removeItem(SESSION)}catch(_){}
+      adminCode=''; rows=[]; list.innerHTML=''; showLoginError(false); showLogin();
+    });
+    search.addEventListener('input',render);
+    document.getElementById('viewer-close').addEventListener('click',function(){viewer.close()});
+    viewer.addEventListener('click',function(e){
+      if(e.target===viewer) viewer.close();
+    });
+
+    try{adminCode=sessionStorage.getItem(SESSION)||''}catch(_){}
+    if(adminCode){
+      showDashboard();
+      loadData(false);
+    }else{
+      showLogin();
+    }
+  })();
+  </script>
+</body>
+</html>
