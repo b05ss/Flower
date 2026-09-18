@@ -80,22 +80,7 @@
 </head>
 <body>
   <main class="app">
-    <section id="login" class="login-shell">
-      <div class="login-card">
-        <p class="eyebrow">FLOWER WORKSHOP · ADMIN</p>
-        <h1>Workshop gallery.</h1>
-        <p class="lead">กรอกรหัส Admin เพื่อดูรายชื่อผลงาน รูปดอกไม้ คะแนนความพึงพอใจ และความคิดเห็นของผู้เข้าร่วม</p>
-        <form id="login-form">
-          <div class="code-row">
-            <input id="code" class="code-input" type="password" autocomplete="current-password" placeholder="Admin code" required>
-            <button id="login-btn" class="primary" type="submit">เข้า Admin</button>
-          </div>
-          <p id="login-error" class="error">รหัสไม่ถูกต้อง กรุณาลองใหม่</p>
-        </form>
-      </div>
-    </section>
-
-    <section id="dashboard" class="hidden">
+    <section id="dashboard">
       <header class="topbar">
         <div class="brand">
           <p class="eyebrow">FLOWER WORKSHOP · ADMIN</p>
@@ -103,7 +88,6 @@
         </div>
         <div class="actions">
           <button id="refresh" class="icon-btn" type="button">↻ <span>รีเฟรช</span></button>
-          <button id="logout" class="icon-btn" type="button">ออก</button>
         </div>
       </header>
 
@@ -145,17 +129,10 @@
     var SUPABASE_URL='https://cjqcyjuxsqtuybjqumlk.supabase.co';
     var SUPABASE_KEY='sb_publishable_RcExGR9O_43T_v2vfh313w_JGb_w1GS';
     var BUCKET='flower-workshop-uploads';
-    var SESSION='flowerWorkshopAdminCode';
     var client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
       auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
     });
 
-    var login=document.getElementById('login');
-    var dashboard=document.getElementById('dashboard');
-    var loginForm=document.getElementById('login-form');
-    var codeInput=document.getElementById('code');
-    var loginBtn=document.getElementById('login-btn');
-    var loginError=document.getElementById('login-error');
     var list=document.getElementById('list');
     var loading=document.getElementById('loading');
     var empty=document.getElementById('empty');
@@ -163,7 +140,6 @@
     var visibleCount=document.getElementById('visible-count');
     var viewer=document.getElementById('viewer');
     var rows=[];
-    var adminCode='';
 
     function imageUrl(path){
       return client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
@@ -175,22 +151,6 @@
     }
     function stars(n){
       n=Number(n||0); return n ? '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n) : '';
-    }
-    function setBusy(on){
-      loginBtn.disabled=on;
-      loginBtn.textContent=on?'กำลังตรวจ...':'เข้า Admin';
-    }
-    function showLoginError(show){
-      loginError.classList.toggle('show',!!show);
-    }
-    function showDashboard(){
-      login.classList.add('hidden');
-      dashboard.classList.remove('hidden');
-    }
-    function showLogin(){
-      dashboard.classList.add('hidden');
-      login.classList.remove('hidden');
-      codeInput.focus();
     }
     function toast(){
       var el=document.getElementById('toast');
@@ -263,6 +223,7 @@
           p.textContent='ยังไม่ส่งแบบประเมิน';
           body.appendChild(p);
         }
+
         item.appendChild(thumb); item.appendChild(body);
         list.appendChild(item);
       });
@@ -280,15 +241,13 @@
       loading.classList.remove('hidden');
       list.classList.add('hidden');
       empty.classList.add('hidden');
-      var result=await client.rpc('flower_workshop_admin_list',{p_code:adminCode});
+      var result=await client.rpc('flower_workshop_admin_list');
       loading.classList.add('hidden');
       list.classList.remove('hidden');
       if(result.error){
         console.error(result.error);
-        sessionStorage.removeItem(SESSION);
-        adminCode='';
-        showLogin();
-        showLoginError(true);
+        empty.textContent='โหลดข้อมูลไม่สำเร็จ กรุณารีเฟรชอีกครั้ง';
+        empty.classList.remove('hidden');
         return false;
       }
       rows=result.data||[];
@@ -298,38 +257,14 @@
       return true;
     }
 
-    loginForm.addEventListener('submit',async function(e){
-      e.preventDefault();
-      showLoginError(false);
-      adminCode=codeInput.value.trim().toUpperCase();
-      if(!adminCode)return;
-      setBusy(true);
-      var ok=await loadData(false);
-      setBusy(false);
-      if(ok){
-        try{sessionStorage.setItem(SESSION,adminCode)}catch(_){}
-        codeInput.value='';
-        showDashboard();
-      }
-    });
     document.getElementById('refresh').addEventListener('click',function(){loadData(true)});
-    document.getElementById('logout').addEventListener('click',function(){
-      try{sessionStorage.removeItem(SESSION)}catch(_){}
-      adminCode=''; rows=[]; list.innerHTML=''; showLoginError(false); showLogin();
-    });
     search.addEventListener('input',render);
     document.getElementById('viewer-close').addEventListener('click',function(){viewer.close()});
     viewer.addEventListener('click',function(e){
       if(e.target===viewer) viewer.close();
     });
 
-    try{adminCode=sessionStorage.getItem(SESSION)||''}catch(_){}
-    if(adminCode){
-      showDashboard();
-      loadData(false);
-    }else{
-      showLogin();
-    }
+    loadData(false);
   })();
   </script>
 </body>
