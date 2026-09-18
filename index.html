@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f3ec" />
+  <title>Flower Arrangement Workshop</title>
+  <meta name="description" content="ส่งภาพผลงานดอกไม้และประเมินความพึงพอใจกิจกรรม Flower Arrangement Workshop" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f7f3ec;
+      --paper-2: #efe9df;
+      --ink: #24332d;
+      --ink-soft: #68766f;
+      --forest: #315e4c;
+      --forest-dark: #244638;
+      --rose: #c9838d;
+      --rose-soft: #efd9dc;
+      --line: rgba(49, 94, 76, .16);
+      --white: #fffdfa;
+      --danger: #9a4545;
+      --shadow: 0 18px 60px rgba(43, 58, 50, .10);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 7% 7%, rgba(201, 131, 141, .12), transparent 30%),
+        radial-gradient(circle at 94% 92%, rgba(49, 94, 76, .10), transparent 34%),
+        var(--paper);
+      font-family: "Noto Sans Thai", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+
+    .shell {
+      position: relative;
+      width: min(100%, 760px);
+      margin: 0 auto;
+      min-height: 100svh;
+      padding: max(22px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
+      display: grid;
+      align-content: center;
+    }
+
+    .botanical {
+      position: fixed;
+      pointer-events: none;
+      opacity: .22;
+      color: var(--forest);
+      z-index: 0;
+    }
+    .botanical-a { width: 190px; top: -28px; right: -62px; transform: rotate(10deg); }
+    .botanical-b { width: 180px; bottom: -48px; left: -68px; transform: rotate(186deg); opacity: .15; }
+
+    .panel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      background: rgba(255, 253, 250, .92);
+      border: 1px solid rgba(255,255,255,.88);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 26px 20px 22px;
+      backdrop-filter: blur(12px);
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.35;
+      letter-spacing: .14em;
+      font-weight: 700;
+      color: var(--forest);
+    }
+
+    .step {
+      min-width: 56px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+
+    h1, h2, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 10px;
+      font-family: "DM Serif Display", Georgia, serif;
+      font-size: clamp(34px, 9vw, 56px);
+      line-height: .98;
+      font-weight: 400;
+      letter-spacing: -.025em;
+      color: var(--forest-dark);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: clamp(27px, 7vw, 40px);
+      line-height: 1.14;
+      letter-spacing: -.03em;
+      color: var(--forest-dark);
+    }
+
+    .lead {
+      margin-bottom: 24px;
+      max-width: 560px;
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--ink-soft);
+    }
+
+    .field { margin-top: 20px; }
+    .label-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+    label, .field-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .optional { font-size: 12px; color: var(--ink-soft); }
+
+    .upload {
+      position: relative;
+      min-height: 250px;
+      border: 1.5px dashed rgba(49, 94, 76, .30);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, rgba(239, 217, 220, .34), rgba(239, 233, 223, .34));
+      overflow: hidden;
+      transition: border-color .2s ease, transform .2s ease, background .2s ease;
+    }
+
+    .upload:focus-within { border-color: var(--forest); }
+    .upload.has-image { border-style: solid; background: #e7e4dc; }
+
+    .upload input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    .upload-empty {
+      min-height: 250px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 28px;
+    }
+    .upload-empty-inner { max-width: 280px; }
+    .camera-mark {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--white);
+      color: var(--forest);
+      box-shadow: 0 8px 30px rgba(49,94,76,.10);
+    }
+    .camera-mark svg { width: 23px; height: 23px; }
+    .upload-title { margin: 0; font-size: 15px; font-weight: 700; }
+    .upload-meta { margin: 6px 0 0; font-size: 12px; line-height: 1.6; color: var(--ink-soft); }
+
+    #preview {
+      display: none;
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+    }
+    .has-image #preview { display: block; }
+    .has-image .upload-empty { display: none; }
+    .replace-chip {
+      display: none;
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 2;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(36, 51, 45, .82);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+    .has-image .replace-chip { display: block; }
+
+    .text-input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      outline: none;
+      border-radius: var(--radius-md);
+      background: #fff;
+      color: var(--ink);
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .text-input {
+      height: 54px;
+      padding: 0 16px;
+      font-size: 16px;
+    }
+    textarea {
+      min-height: 118px;
+      resize: vertical;
+      padding: 14px 16px;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+    .text-input:focus, textarea:focus {
+      border-color: rgba(49,94,76,.55);
+      box-shadow: 0 0 0 4px rgba(49,94,76,.08);
+    }
+    ::placeholder { color: #a4aba6; }
+
+    .primary {
+      width: 100%;
+      min-height: 56px;
+      margin-top: 24px;
+      border: 0;
+      border-radius: 18px;
+      background: var(--forest);
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(49,94,76,.18);
+      transition: transform .16s ease, background .16s ease, opacity .16s ease;
+    }
+    .primary:hover { background: var(--forest-dark); }
+    .primary:active { transform: translateY(1px) scale(.995); }
+    .primary:disabled { cursor: not-allowed; opacity: .58; box-shadow: none; }
+
+    .error {
+      display: none;
+      margin-top: 14px;
+      padding: 11px 13px;
+      border-radius: 13px;
+      background: #f8e9e7;
+      color: var(--danger);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .error.show { display: block; }
+
+    .feedback-summary {
+      display: grid;
+      grid-template-columns: 76px minmax(0,1fr);
+      gap: 14px;
+      align-items: center;
+      margin: 20px 0 26px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(247,243,236,.72);
+    }
+    .feedback-summary img {
+      width: 76px;
+      height: 76px;
+      object-fit: cover;
+      border-radius: 14px;
+      background: var(--paper-2);
+    }
+    .summary-kicker { margin: 0 0 3px; color: var(--ink-soft); font-size: 11px; }
+    .summary-name { margin: 0; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+
+    .rating-wrap { margin-top: 24px; }
+    .stars {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-top: 11px;
+    }
+    .star-btn {
+      min-height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+      color: #c7c9c4;
+      cursor: pointer;
+      transition: transform .14s ease, color .14s ease, border-color .14s ease, background .14s ease;
+    }
+    .star-btn svg { width: 27px; height: 27px; fill: currentColor; }
+    .star-btn.active {
+      color: #c99643;
+      border-color: rgba(201,150,67,.30);
+      background: #fff9ec;
+    }
+    .star-btn:active { transform: scale(.96); }
+
+    .success {
+      text-align: center;
+      padding: 14px 0 6px;
+    }
+    .success-mark {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #e2eee8;
+      color: var(--forest);
+    }
+    .success-mark svg { width: 32px; height: 32px; }
+    .success h2 { margin-bottom: 10px; }
+    .success .lead { margin-left: auto; margin-right: auto; margin-bottom: 0; }
+    .mini-flower {
+      width: min(260px, 75%);
+      aspect-ratio: 1 / 1;
+      margin: 24px auto 0;
+      border-radius: 28px;
+      object-fit: cover;
+      box-shadow: 0 14px 36px rgba(43,58,50,.12);
+      display: none;
+    }
+
+    .secondary {
+      margin-top: 16px;
+      border: 0;
+      background: transparent;
+      color: var(--forest);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 12px 18px;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; animation: enter .32s cubic-bezier(.2,.75,.2,1) both; }
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      border: 2px solid rgba(255,255,255,.45);
+      border-top-color: #fff;
+      border-radius: 50%;
+      vertical-align: -3px;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .tiny-note {
+      margin: 12px 0 0;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.55;
+      color: #8b938f;
+    }
+
+    @media (min-width: 640px) {
+      .shell { padding: 36px 28px; }
+      .panel { padding: 36px 38px 32px; }
+      #preview, .upload-empty { min-height: 330px; height: 330px; }
+      .upload { min-height: 330px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="botanical botanical-a" viewBox="0 0 180 260" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <path d="M87 250C83 191 94 139 126 80C143 49 148 25 143 5"/>
+      <path d="M101 151C72 134 48 108 35 77"/>
+      <path d="M115 102C137 102 155 91 169 73"/>
+      <path d="M63 117C44 120 27 110 15 95"/>
+      <path d="M130 70C119 56 117 39 124 23C142 28 153 41 155 60C148 67 140 70 130 70Z"/>
+      <path d="M40 82C42 62 33 47 17 37C6 52 7 70 19 84C26 85 33 84 40 82Z"/>
+      <path d="M157 79C161 63 170 52 179 49"/>
+    </g>
+  </svg>
+  <svg class="botanical botanical-b" viewBox="0 0 180 260" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <path d="M87 250C83 191 94 139 126 80C143 49 148 25 143 5"/>
+      <path d="M101 151C72 134 48 108 35 77"/>
+      <path d="M115 102C137 102 155 91 169 73"/>
+      <path d="M63 117C44 120 27 110 15 95"/>
+      <path d="M130 70C119 56 117 39 124 23C142 28 153 41 155 60C148 67 140 70 130 70Z"/>
+      <path d="M40 82C42 62 33 47 17 37C6 52 7 70 19 84C26 85 33 84 40 82Z"/>
+    </g>
+  </svg>
+
+  <main class="shell">
+    <section class="panel" aria-live="polite">
+      <div id="submit-screen" class="screen active">
+        <div class="topline">
+          <p class="eyebrow">FLOWER ARRANGEMENT WORKSHOP</p>
+          <span class="step">01 / 02</span>
+        </div>
+        <h1>Name your bloom.</h1>
+        <p class="lead">ถ่ายภาพผลงานที่เพิ่งจัด ตั้งชื่อให้ดอกไม้ช่อนี้ แล้วบันทึกเป็นหนึ่งในความทรงจำของวันนี้</p>
+
+        <form id="flower-form" novalidate>
+          <div class="field">
+            <div class="label-row"><label for="flower-photo">ภาพดอกไม้</label></div>
+            <div id="upload-box" class="upload">
+              <input id="flower-photo" type="file" accept="image/*" capture="environment" aria-label="ถ่ายภาพหรือเลือกรูปดอกไม้" required />
+              <div class="upload-empty">
+                <div class="upload-empty-inner">
+                  <div class="camera-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5 13.2 3h-2.4L9.5 5.5H5.8A2.8 2.8 0 0 0 3 8.3v8.9A2.8 2.8 0 0 0 5.8 20h12.4a2.8 2.8 0 0 0 2.8-2.8V8.3a2.8 2.8 0 0 0-2.8-2.8h-3.7Z"/><circle cx="12" cy="12.5" r="3.5"/></svg>
+                  </div>
+                  <p class="upload-title">แตะเพื่อถ่ายภาพหรือเลือกรูป</p>
+                  <p class="upload-meta">ระบบจะย่อภาพให้อัตโนมัติก่อนอัปโหลด เพื่อให้ส่งได้เร็วขึ้น</p>
+                </div>
+              </div>
+              <img id="preview" alt="ตัวอย่างภาพดอกไม้ที่เลือก" />
+              <span class="replace-chip">แตะเพื่อเปลี่ยนรูป</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label-row"><label for="flower-name">ชื่อดอกไม้</label><span class="optional">สูงสุด 80 ตัวอักษร</span></div>
+            <input id="flower-name" class="text-input" type="text" maxlength="80" autocomplete="off" placeholder="เช่น Morning Bloom" required />
+          </div>
+
+          <button id="submit-flower" class="primary" type="submit">ลงทะเบียนดอกไม้</button>
+          <div id="submit-error" class="error" role="alert"></div>
+          <p class="tiny-note">รูปและชื่อดอกไม้จะใช้สำหรับกิจกรรมอบรมครั้งนี้</p>
+        </form>
+      </div>
+
+      <div id="feedback-screen" class="screen">
+        <div class="topline">
+          <p class="eyebrow">FLOWER ARRANGEMENT WORKSHOP</p>
+          <span class="step">02 / 02</span>
+        </div>
+        <h2>กิจกรรมวันนี้เป็นอย่างไรบ้าง?</h2>
+        <p class="lead">ให้คะแนนความพึงพอใจสั้น ๆ อีกหนึ่งขั้น แล้วเสร็จเรียบร้อย</p>
+
+        <div class="feedback-summary">
+          <img id="feedback-image" alt="ภาพดอกไม้ที่ส่งแล้ว" />
+          <div>
+            <p class="summary-kicker">ดอกไม้ของคุณ</p>
+            <p id="feedback-name" class="summary-name"></p>
+          </div>
+        </div>
+
+        <form id="feedback-form" novalidate>
+          <div class="rating-wrap">
+            <div class="label-row"><span class="field-label">ความพึงพอใจโดยรวม</span><span id="rating-text" class="optional">เลือก 1–5 ดาว</span></div>
+            <div class="stars" role="radiogroup" aria-label="ให้คะแนนความพึงพอใจ 1 ถึง 5 ดาว">
+              <button class="star-btn" type="button" data-rating="1" role="radio" aria-checked="false" aria-label="1 ดาว"><svg viewBox="0 0 24 24"><path d="m12 2.7 2.82 5.72 6.31.92-4.57 4.45 1.08 6.28L12 17.1l-5.64 2.97 1.08-6.28-4.57-4.45 6.31-.92L12 2.7Z"/></svg></button>
+              <button class="star-btn" type="button" data-rating="2" role="radio" aria-checked="false" aria-label="2 ดาว"><svg viewBox="0 0 24 24"><path d="m12 2.7 2.82 5.72 6.31.92-4.57 4.45 1.08 6.28L12 17.1l-5.64 2.97 1.08-6.28-4.57-4.45 6.31-.92L12 2.7Z"/></svg></button>
+              <button class="star-btn" type="button" data-rating="3" role="radio" aria-checked="false" aria-label="3 ดาว"><svg viewBox="0 0 24 24"><path d="m12 2.7 2.82 5.72 6.31.92-4.57 4.45 1.08 6.28L12 17.1l-5.64 2.97 1.08-6.28-4.57-4.45 6.31-.92L12 2.7Z"/></svg></button>
+              <button class="star-btn" type="button" data-rating="4" role="radio" aria-checked="false" aria-label="4 ดาว"><svg viewBox="0 0 24 24"><path d="m12 2.7 2.82 5.72 6.31.92-4.57 4.45 1.08 6.28L12 17.1l-5.64 2.97 1.08-6.28-4.57-4.45 6.31-.92L12 2.7Z"/></svg></button>
+              <button class="star-btn" type="button" data-rating="5" role="radio" aria-checked="false" aria-label="5 ดาว"><svg viewBox="0 0 24 24"><path d="m12 2.7 2.82 5.72 6.31.92-4.57 4.45 1.08 6.28L12 17.1l-5.64 2.97 1.08-6.28-4.57-4.45 6.31-.92L12 2.7Z"/></svg></button>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label-row"><label for="comment">ความคิดเห็นเพิ่มเติม</label><span class="optional">ไม่บังคับ</span></div>
+            <textarea id="comment" maxlength="1000" placeholder="มีอะไรที่ชอบ หรืออยากให้ปรับเพิ่มเติม บอกเราได้เลย"></textarea>
+          </div>
+
+          <button id="submit-feedback" class="primary" type="submit">ส่งแบบประเมิน</button>
+          <div id="feedback-error" class="error" role="alert"></div>
+        </form>
+      </div>
+
+      <div id="success-screen" class="screen success">
+        <div class="success-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.2 4.2L19 7"/></svg>
+        </div>
+        <p class="eyebrow">ALL DONE</p>
+        <h2>ขอบคุณที่มาร่วมจัดดอกไม้ด้วยกัน</h2>
+        <p class="lead">ดอกไม้ของคุณถูกบันทึกแล้ว และความคิดเห็นถูกส่งเรียบร้อย</p>
+        <img id="success-image" class="mini-flower" alt="ภาพดอกไม้ของคุณ" />
+        <button id="restart" class="secondary" type="button">ส่งดอกไม้อีกช่อ</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
+  <script>
+    (() => {
+      const SUPABASE_URL = 'https://cjqcyjuxsqtuybjqumlk.supabase.co';
+      const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_RcExGR9O_43T_v2vfh313w_JGb_w1GS';
+      const BUCKET = 'flower-workshop-uploads';
+      const SESSION_KEY = 'flowerWorkshopPendingFeedback';
+
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      });
+
+      const screens = {
+        submit: document.getElementById('submit-screen'),
+        feedback: document.getElementById('feedback-screen'),
+        success: document.getElementById('success-screen')
+      };
+
+      const flowerForm = document.getElementById('flower-form');
+      const photoInput = document.getElementById('flower-photo');
+      const nameInput = document.getElementById('flower-name');
+      const preview = document.getElementById('preview');
+      const uploadBox = document.getElementById('upload-box');
+      const submitFlowerButton = document.getElementById('submit-flower');
+      const submitError = document.getElementById('submit-error');
+
+      const feedbackForm = document.getElementById('feedback-form');
+      const feedbackImage = document.getElementById('feedback-image');
+      const feedbackName = document.getElementById('feedback-name');
+      const submitFeedbackButton = document.getElementById('submit-feedback');
+      const feedbackError = document.getElementById('feedback-error');
+      const ratingText = document.getElementById('rating-text');
+      const starButtons = [...document.querySelectorAll('.star-btn')];
+      const successImage = document.getElementById('success-image');
+      const restartButton = document.getElementById('restart');
+
+      let selectedFile = null;
+      let previewUrl = null;
+      let selectedRating = 0;
+      let pendingSubmission = null;
+
+      function uuid() {
+        if (crypto.randomUUID) return crypto.randomUUID();
+        const bytes = crypto.getRandomValues(new Uint8Array(16));
+        bytes[6] = (bytes[6] & 0x0f) | 0x40;
+        bytes[8] = (bytes[8] & 0x3f) | 0x80;
+        const hex = [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
+        return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+      }
+
+      function showScreen(name) {
+        Object.values(screens).forEach(el => el.classList.remove('active'));
+        screens[name].classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function setError(el, message = '') {
+        el.textContent = message;
+        el.classList.toggle('show', Boolean(message));
+      }
+
+      function setBusy(button, busy, busyText, normalText) {
+        button.disabled = busy;
+        button.innerHTML = busy ? `<span class="loader"></span>${busyText}` : normalText;
+      }
+
+      function loadImage(file) {
+        return new Promise((resolve, reject) => {
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+          img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('ไม่สามารถอ่านไฟล์รูปนี้ได้')); };
+          img.src = url;
+        });
+      }
+
+      async function prepareImage(file) {
+        if (!file || !(file.type || '').startsWith('image/')) {
+          throw new Error('กรุณาเลือกไฟล์รูปภาพ');
+        }
+        if (file.size > 25 * 1024 * 1024) {
+          throw new Error('รูปมีขนาดใหญ่เกินไป กรุณาใช้รูปที่เล็กกว่า 25 MB');
+        }
+
+        try {
+          const img = await loadImage(file);
+          const maxSide = 1600;
+          const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+          const width = Math.max(1, Math.round(img.naturalWidth * scale));
+          const height = Math.max(1, Math.round(img.naturalHeight * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d', { alpha: false });
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', .84));
+          if (blob) return { blob, extension: 'jpg', contentType: 'image/jpeg' };
+        } catch (error) {
+          console.warn('Image optimization skipped:', error);
+        }
+
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 6) || 'jpg';
+        return { blob: file, extension: ext, contentType: file.type || 'application/octet-stream' };
+      }
+
+      function publicImageUrl(path) {
+        const { data } = client.storage.from(BUCKET).getPublicUrl(path);
+        return data.publicUrl;
+      }
+
+      function openFeedback(submission) {
+        pendingSubmission = submission;
+        feedbackName.textContent = submission.flowerName;
+        feedbackImage.src = submission.imageUrl;
+        successImage.src = submission.imageUrl;
+        successImage.style.display = 'block';
+        try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(submission)); } catch (_) {}
+        showScreen('feedback');
+      }
+
+      photoInput.addEventListener('change', () => {
+        setError(submitError);
+        const file = photoInput.files && photoInput.files[0];
+        if (!file) return;
+        if (!(file.type || '').startsWith('image/')) {
+          selectedFile = null;
+          photoInput.value = '';
+          setError(submitError, 'กรุณาเลือกไฟล์รูปภาพ');
+          return;
+        }
+        selectedFile = file;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = URL.createObjectURL(file);
+        preview.src = previewUrl;
+        uploadBox.classList.add('has-image');
+      });
+
+      flowerForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        setError(submitError);
+        const flowerName = nameInput.value.trim();
+
+        if (!selectedFile) {
+          setError(submitError, 'กรุณาถ่ายภาพหรือเลือกรูปดอกไม้ก่อน');
+          uploadBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        if (!flowerName) {
+          setError(submitError, 'กรุณาตั้งชื่อดอกไม้ของคุณ');
+          nameInput.focus();
+          return;
+        }
+
+        setBusy(submitFlowerButton, true, 'กำลังส่งดอกไม้...', 'ลงทะเบียนดอกไม้');
+        const submissionId = uuid();
+
+        try {
+          const prepared = await prepareImage(selectedFile);
+          const imagePath = `submissions/${submissionId}.${prepared.extension}`;
+
+          const { error: uploadError } = await client.storage
+            .from(BUCKET)
+            .upload(imagePath, prepared.blob, {
+              contentType: prepared.contentType,
+              cacheControl: '3600',
+              upsert: false
+            });
+          if (uploadError) throw uploadError;
+
+          const { error: insertError } = await client
+            .from('flower_workshop_submissions')
+            .insert({ id: submissionId, flower_name: flowerName, image_path: imagePath });
+          if (insertError && insertError.code !== '23505') throw insertError;
+
+          openFeedback({
+            id: submissionId,
+            flowerName,
+            imagePath,
+            imageUrl: publicImageUrl(imagePath)
+          });
+        } catch (error) {
+          console.error(error);
+          setError(submitError, 'ส่งข้อมูลไม่สำเร็จ กรุณาลองอีกครั้ง หรือเปลี่ยนเครือข่ายแล้วลองใหม่');
+        } finally {
+          setBusy(submitFlowerButton, false, '', 'ลงทะเบียนดอกไม้');
+        }
+      });
+
+      starButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          selectedRating = Number(button.dataset.rating);
+          starButtons.forEach((star, index) => {
+            const active = index < selectedRating;
+            star.classList.toggle('active', active);
+            star.setAttribute('aria-checked', Number(star.dataset.rating) === selectedRating ? 'true' : 'false');
+          });
+          const labels = ['ไม่พอใจ', 'พอใช้', 'ปานกลาง', 'พอใจ', 'พอใจมาก'];
+          ratingText.textContent = `${selectedRating} ดาว · ${labels[selectedRating - 1]}`;
+          setError(feedbackError);
+        });
+      });
+
+      feedbackForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        setError(feedbackError);
+        if (!pendingSubmission) {
+          setError(feedbackError, 'ไม่พบข้อมูลดอกไม้ กรุณากลับไปส่งใหม่');
+          return;
+        }
+        if (!selectedRating) {
+          setError(feedbackError, 'กรุณาเลือกคะแนนความพึงพอใจ 1–5 ดาว');
+          return;
+        }
+
+        setBusy(submitFeedbackButton, true, 'กำลังส่งแบบประเมิน...', 'ส่งแบบประเมิน');
+        try {
+          const comment = document.getElementById('comment').value.trim();
+          const { error } = await client
+            .from('flower_workshop_feedback')
+            .insert({
+              id: uuid(),
+              submission_id: pendingSubmission.id,
+              rating: selectedRating,
+              comment: comment || null
+            });
+          if (error && error.code !== '23505') throw error;
+
+          try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
+          showScreen('success');
+        } catch (error) {
+          console.error(error);
+          setError(feedbackError, 'ส่งแบบประเมินไม่สำเร็จ กรุณาลองอีกครั้ง');
+        } finally {
+          setBusy(submitFeedbackButton, false, '', 'ส่งแบบประเมิน');
+        }
+      });
+
+      restartButton.addEventListener('click', () => {
+        selectedFile = null;
+        selectedRating = 0;
+        pendingSubmission = null;
+        flowerForm.reset();
+        feedbackForm.reset();
+        photoInput.value = '';
+        preview.removeAttribute('src');
+        uploadBox.classList.remove('has-image');
+        starButtons.forEach(star => {
+          star.classList.remove('active');
+          star.setAttribute('aria-checked', 'false');
+        });
+        ratingText.textContent = 'เลือก 1–5 ดาว';
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+        showScreen('submit');
+      });
+
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+        if (saved && saved.id && saved.flowerName && saved.imagePath) {
+          saved.imageUrl = saved.imageUrl || publicImageUrl(saved.imagePath);
+          openFeedback(saved);
+        }
+      } catch (_) {}
+    })();
+  </script>
+</body>
+</html>
